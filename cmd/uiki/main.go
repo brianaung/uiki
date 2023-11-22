@@ -12,9 +12,12 @@ func main() {
 	flag.Parse()
 
 	r := mux.NewRouter()
-	r.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte("Hello World"))
-	})
+
+	// init dependencies
+  s := &server{r: r}
+
+	// catch routes
+	s.route()
 
 	http.ListenAndServe(*addr, r)
 }
