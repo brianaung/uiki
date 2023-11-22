@@ -8,6 +8,7 @@ import (
 
 func (s *server) handleLanding() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		s.enableCors(&w)
 		ps, err := s.getAllPages()
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)

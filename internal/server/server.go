@@ -2,6 +2,7 @@ package server
 
 import (
 	"fmt"
+	"net/http"
 
 	"github.com/gorilla/mux"
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -20,4 +21,8 @@ func NewServer(addr *string, router *mux.Router, db *pgxpool.Pool) *server {
 	fmt.Println("Server started on port", *addr)
 
 	return s
+}
+
+func (s *server) enableCors(w *http.ResponseWriter) {
+	(*w).Header().Set("Access-Control-Allow-Origin", "*")
 }
