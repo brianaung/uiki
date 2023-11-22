@@ -24,5 +24,6 @@ func NewServer(addr *string, router *mux.Router, db *pgxpool.Pool) *server {
 }
 
 func (s *server) enableCors(w *http.ResponseWriter) {
+	// todo: limit origins to client
 	(*w).Header().Set("Access-Control-Allow-Origin", "*")
 }
