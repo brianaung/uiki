@@ -4,6 +4,7 @@ import (
 	"flag"
 	"net/http"
 
+	"github.com/brianaung/uiki/internal/server"
 	"github.com/gorilla/mux"
 )
 
@@ -11,13 +12,10 @@ func main() {
 	addr := flag.String("addr", ":4000", "the server listen address")
 	flag.Parse()
 
-	r := mux.NewRouter()
+	router := mux.NewRouter()
 
 	// init dependencies
-  s := &server{r: r}
+	server.NewServer(router)
 
-	// catch routes
-	s.route()
-
-	http.ListenAndServe(*addr, r)
+	http.ListenAndServe(*addr, router)
 }
