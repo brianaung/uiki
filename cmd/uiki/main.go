@@ -4,6 +4,7 @@ import (
 	"flag"
 	"net/http"
 
+	"github.com/brianaung/uiki/internal/db"
 	"github.com/brianaung/uiki/internal/server"
 	"github.com/gorilla/mux"
 )
@@ -13,9 +14,10 @@ func main() {
 	flag.Parse()
 
 	router := mux.NewRouter()
+	db := db.Connect()
 
 	// init dependencies
-	server.NewServer(router)
+	server.NewServer(router, db)
 
 	http.ListenAndServe(*addr, router)
 }
