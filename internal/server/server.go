@@ -26,6 +26,13 @@ func NewServer(addr *string, router *mux.Router, db *pgxpool.Pool) *server {
 func (s *server) route() {
 	s.router.HandleFunc("/", s.withCorsEnabled(s.handleLanding()))
 	s.router.HandleFunc("/view/{title}", s.withCorsEnabled(s.handleView()))
+
+	// s.router.HandleFunc("/new", s.withCorsEnabled(s.handleNew()))
+	// s.router.HandleFunc("/edit/{title}", s.withCorsEnabled(s.handleEdit()))
+	// s.router.HandleFunc("/delete/{title}", s.withCorsEnabled(s.handleDelete()))
+
+	s.router.HandleFunc("/save", s.withCorsEnabled(s.handleSave()))
+	// s.router.HandleFunc("/save/{title}", s.withCorsEnabled(s.handleSave()))
 }
 
 // middleware to enable cors
