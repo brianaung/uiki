@@ -1,5 +1,7 @@
-import { useEffect, useState } from "react";
+import { useQuery } from "react-query";
 import { Link } from "wouter";
+import { Loading } from "../components/loading";
+import { Error } from "../components/error";
 
 type Page = {
   title: string;
@@ -7,33 +9,31 @@ type Page = {
 };
 
 const LandingPage = () => {
-  const [pages, setPages] = useState<Page[]>();
+  const fetchAllPagesData = async (): Promise<Page[]> =>
+    await fetch(`http://localhost:4000`).then(async (res) => await res.json());
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const res = await fetch("http://localhost:4000/");
-        const pages = await res.json();
-        setPages(pages);
-      } catch (error) {
-        console.log(error);
-        // todo: handle error gracefully
-        // setError(error);
-      }
-    };
-    fetchData();
-  }, []);
+  const { isLoading, error, data } = useQuery(
+    "allPagesData",
+    fetchAllPagesData,
+  );
 
   return (
     <>
       <h2>This is the landing page.</h2>
       <ul>
-        {pages &&
-          pages.map((v, idx) => (
+        {isLoading ? (
+          <Loading />
+        ) : error ? (
+          <Error />
+        ) : data ? (
+          data.map((v, idx) => (
             <li key={idx}>
               <Link href={`/view/${v.title}`}>{v.title}</Link>
             </li>
-          ))}
+          ))
+        ) : (
+          <></>
+        )}
       </ul>
     </>
   );

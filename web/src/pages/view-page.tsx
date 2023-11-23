@@ -1,27 +1,43 @@
+import { useQuery } from "react-query";
 import { useParams } from "wouter";
+import { Loading } from "../components/loading";
+import { Error } from "../components/error";
+
+type Page = {
+  title: string;
+  body: string;
+};
 
 const ViewPage = () => {
-  // const [page, setPage] = useState<Page>();
-  //
-  // const handleView = async (title: string) => {
-  //   try {
-  //     const res = await fetch(`http://localhost:4000/view/${title}`, {
-  //       method: "POST",
-  //     });
-  //     const data = await res.json();
-  //     setPage(data);
-  //   } catch (error) {
-  //     console.log(error);
-  //     // setError(...
-  //   }
-  // };
-
   const params = useParams();
-  console.log(params.title);
+
+  const fetchPageData = async (): Promise<Page> =>
+    await fetch(`http://localhost:4000/view/${params.title}`).then(
+      async (res) => await res.json(),
+    );
+
+  const { isLoading, error, data } = useQuery("pageData", fetchPageData);
+
+  const handleEdit = () => {};
+
+  const handleDelete = () => {};
 
   return (
     <>
-      <h2>This is the view page.</h2>
+      {isLoading ? (
+        <Loading />
+      ) : error ? (
+        <Error />
+      ) : data ? (
+        <article>
+          <button onClick={handleEdit}>edit</button>
+          <button onClick={handleDelete}>delete</button>
+          <h2>{data.title}</h2>
+          <p>{data.body}</p>
+        </article>
+      ) : (
+        <></>
+      )}
     </>
   );
 };
