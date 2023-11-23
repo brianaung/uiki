@@ -52,6 +52,8 @@ func (s *server) handleSave() http.HandlerFunc {
 		body := r.FormValue("body")
 		oldTitle := r.FormValue("oldTitle")
 
+		// TODO: data validation in both client and server
+
 		page := &page{Title: title, Body: body}
 
 		var err error

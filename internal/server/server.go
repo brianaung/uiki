@@ -35,7 +35,7 @@ func (s *server) route() {
 // similar method can be used to create middleware for auth
 func (s *server) withCorsEnabled(h http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		// todo: limit origins to client
+		// TODO: limit origins to client
 		w.Header().Set("Access-Control-Allow-Origin", "*")
 		h(w, r)
 	}

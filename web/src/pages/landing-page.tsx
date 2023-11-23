@@ -7,6 +7,7 @@ import { Page } from "../@types/types";
 import { useState } from "react";
 import { FormDialog } from "../components/form-dialog";
 
+// TODO: handle errors gracefully (across the whole app)
 const LandingPage = () => {
   /* query all pages data initially */
   const fetchAllPagesData = async (): Promise<Page[]> =>
