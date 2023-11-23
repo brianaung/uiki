@@ -3,18 +3,13 @@ import { Link } from "wouter";
 import { Loading } from "../components/loading";
 import { Error } from "../components/error";
 import { PageTemplate } from "./page-template";
-
-type Page = {
-  title: string;
-  body: string;
-};
+import { Page } from "../@types/types";
 
 const LandingPage = () => {
   const fetchAllPagesData = async (): Promise<Page[]> =>
     await fetch(import.meta.env.VITE_UIKI_SERVER_URL).then(
       async (res) => await res.json(),
     );
-
   const { isLoading, error, data } = useQuery(
     "allPagesData",
     fetchAllPagesData,

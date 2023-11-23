@@ -29,7 +29,7 @@ func (s *server) route() {
 
 	// s.router.HandleFunc("/new", s.withCorsEnabled(s.handleNew()))
 	// s.router.HandleFunc("/edit/{title}", s.withCorsEnabled(s.handleEdit()))
-	// s.router.HandleFunc("/delete/{title}", s.withCorsEnabled(s.handleDelete()))
+	s.router.HandleFunc("/delete/{title}", s.withCorsEnabled(s.handleDelete()))
 
 	s.router.HandleFunc("/save", s.withCorsEnabled(s.handleSave()))
 	// s.router.HandleFunc("/save/{title}", s.withCorsEnabled(s.handleSave()))

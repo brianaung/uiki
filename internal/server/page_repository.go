@@ -49,3 +49,8 @@ func (s *server) updatePage(oldTitle string, p *page) error {
 	_, err := s.db.Exec(context.Background(), `update page set title = $1, body = $2 where title = $3`, p.Title, p.Body, oldTitle)
 	return err
 }
+
+func (s *server) deletePage(title string) error {
+	_, err := s.db.Exec(context.Background(), `delete from page where title = $1`, title)
+	return err
+}

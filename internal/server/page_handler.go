@@ -75,6 +75,12 @@ func (s *server) handleSave() http.HandlerFunc {
 
 func (s *server) handleDelete() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte("Deleted"))
+		vars := mux.Vars(r)
+		title := vars["title"]
+
+		err := s.deletePage(title)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
 	}
 }
