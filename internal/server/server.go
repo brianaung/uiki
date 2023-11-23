@@ -23,7 +23,20 @@ func NewServer(addr *string, router *mux.Router, db *pgxpool.Pool) *server {
 	return s
 }
 
-func (s *server) enableCors(w *http.ResponseWriter) {
-	// todo: limit origins to client
-	(*w).Header().Set("Access-Control-Allow-Origin", "*")
+func (s *server) route() {
+	s.router.HandleFunc("/", s.withCorsEnabled(s.handleLanding()))
+	s.router.HandleFunc("/view/{title}", s.withCorsEnabled(s.handleView()))
+
+	s.router.HandleFunc("/save", s.withCorsEnabled(s.handleSave()))
+	s.router.HandleFunc("/delete/{title}", s.withCorsEnabled(s.handleDelete()))
+}
+
+// middleware to enable cors
+// similar method can be used to create middleware for auth
+func (s *server) withCorsEnabled(h http.HandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		// TODO: limit origins to client
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		h(w, r)
+	}
 }

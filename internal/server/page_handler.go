@@ -9,7 +9,6 @@ import (
 
 func (s *server) handleLanding() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		s.enableCors(&w)
 		ps, err := s.getAllPages()
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -28,7 +27,6 @@ func (s *server) handleLanding() http.HandlerFunc {
 
 func (s *server) handleView() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		s.enableCors(&w)
 		vars := mux.Vars(r)
 		title := vars["title"]
 
@@ -45,5 +43,39 @@ func (s *server) handleView() http.HandlerFunc {
 		}
 
 		w.Write(res)
+	}
+}
+
+func (s *server) handleSave() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		title := r.FormValue("title")
+		body := r.FormValue("body")
+		oldTitle := r.FormValue("oldTitle")
+
+		// TODO: data validation in both client and server
+
+		page := &page{Title: title, Body: body}
+
+		var err error
+		if oldTitle == "" {
+			err = s.addPage(page)
+		} else {
+			err = s.updatePage(oldTitle, page)
+		}
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
+	}
+}
+
+func (s *server) handleDelete() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		vars := mux.Vars(r)
+		title := vars["title"]
+
+		err := s.deletePage(title)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
 	}
 }
