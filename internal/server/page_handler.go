@@ -9,7 +9,6 @@ import (
 
 func (s *server) handleLanding() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		s.enableCors(&w)
 		ps, err := s.getAllPages()
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -28,7 +27,6 @@ func (s *server) handleLanding() http.HandlerFunc {
 
 func (s *server) handleView() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		s.enableCors(&w)
 		vars := mux.Vars(r)
 		title := vars["title"]
 
