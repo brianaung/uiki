@@ -45,3 +45,23 @@ func (s *server) handleView() http.HandlerFunc {
 		w.Write(res)
 	}
 }
+
+func (s *server) handleNew() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+	}
+}
+
+func (s *server) handleEdit() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+	}
+}
+
+func (s *server) handleSave() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+	}
+}
+
+func (s *server) handleDelete() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+	}
+}
