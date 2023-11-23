@@ -46,19 +46,6 @@ func (s *server) handleView() http.HandlerFunc {
 	}
 }
 
-func (s *server) handleNew() http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte("Created"))
-	}
-}
-
-// todo: not needed anymore?
-func (s *server) handleEdit() http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte("Edited"))
-	}
-}
-
 func (s *server) handleSave() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		title := r.FormValue("title")
@@ -66,7 +53,13 @@ func (s *server) handleSave() http.HandlerFunc {
 		oldTitle := r.FormValue("oldTitle")
 
 		page := &page{Title: title, Body: body}
-		err := s.updatePage(oldTitle, page)
+
+		var err error
+		if oldTitle == "" {
+			err = s.addPage(page)
+		} else {
+			err = s.updatePage(oldTitle, page)
+		}
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}

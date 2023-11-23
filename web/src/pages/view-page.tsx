@@ -6,6 +6,7 @@ import { Error } from "../components/error";
 import { Dialog } from "@headlessui/react";
 import { PageTemplate } from "./page-template";
 import { Page } from "../@types/types";
+import { FormDialog } from "../components/form-dialog";
 
 const ViewPage = () => {
   const params = useParams();
@@ -29,6 +30,7 @@ const ViewPage = () => {
         method: "POST",
         body: formData,
       });
+      // return title here so it can be accessed inside onSuccess
       return formData.get("title");
     },
     onSuccess: (title) => {
@@ -45,6 +47,7 @@ const ViewPage = () => {
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     e.stopPropagation();
+    // prepare formdata and then mutate
     const formData = new FormData(e.currentTarget);
     if (params.title) {
       formData.append("oldTitle", params.title);
@@ -82,6 +85,7 @@ const ViewPage = () => {
               <h2>{data.title}</h2>
               <p>{data.body}</p>
               <FormDialog
+                title={`Editing ${data.title}`}
                 data={data}
                 isOpen={isFormOpen}
                 setIsOpen={setIsFormOpen}
@@ -101,35 +105,6 @@ const ViewPage = () => {
     />
   );
 };
-
-const FormDialog = ({
-  data,
-  isOpen,
-  setIsOpen,
-  onSubmit,
-}: {
-  data: Page;
-  isOpen: boolean;
-  setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  onSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
-}) => (
-  <Dialog open={isOpen} onClose={() => setIsOpen(false)}>
-    <Dialog.Panel>
-      <Dialog.Title>Editing {data.title}</Dialog.Title>
-      <form onSubmit={onSubmit}>
-        <div>
-          <textarea name="title" defaultValue={data.title} rows={1} cols={80} />
-        </div>
-        <div>
-          <textarea name="body" defaultValue={data.body} rows={20} cols={80} />
-        </div>
-        <div>
-          <input type="submit" value="Save" />
-        </div>
-      </form>
-    </Dialog.Panel>
-  </Dialog>
-);
 
 const DeleteDialog = ({
   isOpen,
