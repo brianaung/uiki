@@ -1,22 +1,42 @@
-import { Dialog } from "@headlessui/react";
 import { Page } from "../@types/types";
+import { useState } from "react";
 
-export const FormDialog = ({
+export const Form = ({
   title,
   data,
-  isOpen,
-  setIsOpen,
   onSubmit,
+  onCancel,
 }: {
   title: string;
   data?: Page;
-  isOpen: boolean;
-  setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
   onSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
-}) => (
-  <Dialog open={isOpen} onClose={() => setIsOpen(false)}>
-    <Dialog.Panel>
-      <Dialog.Title>{title}</Dialog.Title>
+  onCancel: () => void;
+}) => {
+  const [titleValue, setTitleValue] = useState(data?.title ?? "");
+  const [bodyValue, setBodyValue] = useState(data?.body ?? "");
+  const [isSubmitDisabled, setIsSubmitDisabled] = useState(true);
+
+  const handleTitleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setTitleValue(e.target.value);
+    if (e.target.value !== "" && bodyValue !== "") {
+      setIsSubmitDisabled(false);
+    } else {
+      setIsSubmitDisabled(true);
+    }
+  };
+
+  const handleBodyChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setBodyValue(e.target.value);
+    if (e.target.value !== "" && titleValue !== "") {
+      setIsSubmitDisabled(false);
+    } else {
+      setIsSubmitDisabled(true);
+    }
+  };
+
+  return (
+    <section>
+      <h2>{title}</h2>
       <form onSubmit={onSubmit}>
         <div>
           <textarea
@@ -24,6 +44,7 @@ export const FormDialog = ({
             defaultValue={data?.title ?? ""}
             rows={1}
             cols={80}
+            onChange={handleTitleChange}
           />
         </div>
         <div>
@@ -32,13 +53,14 @@ export const FormDialog = ({
             defaultValue={data?.body ?? ""}
             rows={20}
             cols={80}
+            onChange={handleBodyChange}
           />
         </div>
         <div>
-          <input type="submit" value="Save" />
-          <button onClick={() => setIsOpen(false)}>Cancel</button>
+          <input type="submit" value="Save" disabled={isSubmitDisabled} />
+          <button onClick={onCancel}>Cancel</button>
         </div>
       </form>
-    </Dialog.Panel>
-  </Dialog>
-);
+    </section>
+  );
+};
