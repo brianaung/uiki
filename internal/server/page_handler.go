@@ -12,13 +12,15 @@ func (s *server) handleLanding() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ps, err := s.getAllPages()
 		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+			w.WriteHeader(http.StatusInternalServerError)
+			w.Write([]byte("Error getting file"))
 			return
 		}
 
 		res, err := json.Marshal(ps)
 		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+			w.WriteHeader(http.StatusInternalServerError)
+			w.Write([]byte("Error getting file"))
 			return
 		}
 
@@ -34,13 +36,15 @@ func (s *server) handleView() http.HandlerFunc {
 
 		p, err := s.getPageByTitle(title)
 		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+			w.WriteHeader(http.StatusInternalServerError)
+			w.Write([]byte("Error getting file"))
 			return
 		}
 
 		res, err := json.Marshal(p)
 		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+			w.WriteHeader(http.StatusInternalServerError)
+			w.Write([]byte("Error getting file"))
 			return
 		}
 
@@ -84,7 +88,8 @@ func (s *server) handleDelete() http.HandlerFunc {
 
 		err := s.deletePage(title)
 		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+			w.WriteHeader(http.StatusInternalServerError)
+			w.Write([]byte("Error deleting file"))
 		}
 	}
 }

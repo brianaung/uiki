@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useMutation, useQuery } from "react-query";
 import { useParams } from "wouter";
 import { Loading } from "../components/loading";
-import { Error } from "../components/error";
+import { Error as ErrorMessage } from "../components/error";
 import { Dialog } from "@headlessui/react";
 import { PageTemplate } from "./page-template";
 import { Page } from "../@types/types";
@@ -29,8 +29,13 @@ const ViewPage = () => {
         `${import.meta.env.VITE_UIKI_SERVER_URL}/delete/${encodeURIComponent(
           params.title as string,
         )}`,
-      ),
+      ).then(async (res) => {
+        if (!res.ok) {
+          throw new Error(await res.text());
+        }
+      }),
     onSuccess: () => setLocation("/"), // return home on success
+    onError: (err) => alert(err),
   });
   const handleDelete = () => {
     deletion.mutate();
@@ -43,7 +48,7 @@ const ViewPage = () => {
           {isLoading ? (
             <Loading />
           ) : error ? (
-            <Error />
+            <ErrorMessage />
           ) : data ? (
             <article>
               <button
