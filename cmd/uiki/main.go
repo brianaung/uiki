@@ -39,5 +39,5 @@ func main() {
 	// init dependencies
 	server.NewServer(addr, router, dbpool)
 
-	http.ListenAndServe(*addr, router)
+	log.Fatal(http.ListenAndServe(*addr, router))
 }

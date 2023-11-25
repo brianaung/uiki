@@ -32,7 +32,9 @@ const LandingPage = () => {
             ) : data ? (
               data.map((v, idx) => (
                 <li key={idx}>
-                  <Link href={`/view/${v.title}`}>{v.title}</Link>
+                  <Link href={`/view/${encodeURIComponent(v.title)}`}>
+                    {v.title}
+                  </Link>
                 </li>
               ))
             ) : (

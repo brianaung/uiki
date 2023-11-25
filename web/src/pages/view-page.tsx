@@ -14,7 +14,7 @@ const ViewPage = () => {
 
   /* query initial page data */
   const { isLoading, error, data } = useQuery({
-    queryKey: ["pageData", params.title],
+    queryKey: ["pageData", encodeURIComponent(params.title as string)],
     queryFn: async ({ queryKey }): Promise<Page> =>
       await fetch(
         `${import.meta.env.VITE_UIKI_SERVER_URL}/view/${queryKey[1]}`,
@@ -26,7 +26,9 @@ const ViewPage = () => {
   const deletion = useMutation({
     mutationFn: async () =>
       await fetch(
-        `${import.meta.env.VITE_UIKI_SERVER_URL}/delete/${params.title}`,
+        `${import.meta.env.VITE_UIKI_SERVER_URL}/delete/${encodeURIComponent(
+          params.title as string,
+        )}`,
       ),
     onSuccess: () => setLocation("/"), // return home on success
   });
@@ -44,7 +46,11 @@ const ViewPage = () => {
             <Error />
           ) : data ? (
             <article>
-              <button onClick={() => setLocation(`/edit/${data.title}`, data)}>
+              <button
+                onClick={() =>
+                  setLocation(`/edit/${encodeURIComponent(data.title)}`, data)
+                }
+              >
                 edit
               </button>
               <button onClick={() => setIsDeleteOpen(!isDeleteOpen)}>

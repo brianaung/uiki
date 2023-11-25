@@ -3,6 +3,7 @@ package server
 import (
 	"encoding/json"
 	"net/http"
+	"net/url"
 
 	"github.com/gorilla/mux"
 )
@@ -29,6 +30,7 @@ func (s *server) handleView() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
 		title := vars["title"]
+		title, _ = url.QueryUnescape(title)
 
 		p, err := s.getPageByTitle(title)
 		if err != nil {
@@ -51,6 +53,7 @@ func (s *server) handleSave() http.HandlerFunc {
 		title := r.FormValue("title")
 		body := r.FormValue("body")
 		oldTitle := r.FormValue("oldTitle")
+		oldTitle, _ = url.QueryUnescape(oldTitle)
 
 		// TODO: data validation in both client and server
 
@@ -72,6 +75,7 @@ func (s *server) handleDelete() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
 		title := vars["title"]
+		title, _ = url.QueryUnescape(title)
 
 		err := s.deletePage(title)
 		if err != nil {

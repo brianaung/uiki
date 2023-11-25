@@ -24,7 +24,9 @@ const EditPage = () => {
     <Form
       title="Editing Page"
       onSubmit={handleSubmit}
-      onCancel={() => setLocation(`/view/${params.title}`)}
+      onCancel={() =>
+        setLocation(`/view/${encodeURIComponent(params.title as string)}`)
+      }
       data={data}
     />
   );
