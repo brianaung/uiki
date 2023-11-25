@@ -76,7 +76,6 @@ func (s *server) handleLogin() http.HandlerFunc {
 	}
 }
 
-// todo: create auth middleware for protected routes
 func (s *server) withAuth(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		// tokenString := r.Header.Get("Authorization")
