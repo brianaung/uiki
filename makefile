@@ -1,3 +1,5 @@
+include .env
+
 BINARY_NAME=uiki
 
 run:
@@ -8,3 +10,15 @@ build:
 
 start:
 	./bin/$(BINARY_NAME)
+
+clean:
+	rm -rf bin/
+
+up:
+	@goose -dir migrations/ postgres "user=${DATABASE_USER} password=${DATABASE_PASSWORD} dbname=${DATABASE_NAME} sslmode=disable" up
+
+down:
+	@goose -dir migrations/ postgres "user=${DATABASE_USER} password=${DATABASE_PASSWORD} dbname=${DATABASE_NAME} sslmode=disable" down
+
+status:
+	@goose -dir migrations/ postgres "user=${DATABASE_USER} password=${DATABASE_PASSWORD} dbname=${DATABASE_NAME} sslmode=disable" status
