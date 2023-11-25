@@ -34,7 +34,7 @@ func (s *server) handleView() http.HandlerFunc {
 		title := vars["title"]
 		title, _ = url.QueryUnescape(title)
 
-		p, err := s.getPageByTitle(title)
+		p, err := s.getOnePage(title)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			w.Write([]byte("Error getting file"))

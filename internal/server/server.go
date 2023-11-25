@@ -27,6 +27,10 @@ func (s *server) route() {
 	s.router.HandleFunc("/", s.withCorsEnabled(s.handleLanding()))
 	s.router.HandleFunc("/view/{title}", s.withCorsEnabled(s.handleView()))
 
+	// auth
+	s.router.HandleFunc("/register", s.withCorsEnabled(s.handleRegister()))
+	s.router.HandleFunc("/login", s.withCorsEnabled(s.handleLogin()))
+
 	// TODO: protect these routes
 	s.router.HandleFunc("/save", s.withCorsEnabled(s.handleSave()))
 	s.router.HandleFunc("/delete/{title}", s.withCorsEnabled(s.handleDelete()))

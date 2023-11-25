@@ -7,8 +7,9 @@ import (
 )
 
 type page struct {
-	Title string `json:"title"`
-	Body  string `json:"body"`
+	Id    uuid.UUID `json:"id"`
+	Title string    `json:"title"`
+	Body  string    `json:"body"`
 }
 
 func (s *server) getAllPages() ([]page, error) {
@@ -30,7 +31,7 @@ func (s *server) getAllPages() ([]page, error) {
 	return ps, nil
 }
 
-func (s *server) getPageByTitle(title string) (*page, error) {
+func (s *server) getOnePage(title string) (*page, error) {
 	p := &page{}
 	err := s.db.QueryRow(context.Background(), `select title, body from page where title = $1`, title).Scan(&p.Title, &p.Body)
 	if err != nil {
