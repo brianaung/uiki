@@ -3,6 +3,7 @@ package server
 import (
 	"encoding/json"
 	"net/http"
+	"net/url"
 
 	"github.com/gorilla/mux"
 )
@@ -11,13 +12,15 @@ func (s *server) handleLanding() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ps, err := s.getAllPages()
 		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+			w.WriteHeader(http.StatusInternalServerError)
+			w.Write([]byte("Error getting file"))
 			return
 		}
 
 		res, err := json.Marshal(ps)
 		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+			w.WriteHeader(http.StatusInternalServerError)
+			w.Write([]byte("Error getting file"))
 			return
 		}
 
@@ -29,16 +32,19 @@ func (s *server) handleView() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
 		title := vars["title"]
+		title, _ = url.QueryUnescape(title)
 
 		p, err := s.getPageByTitle(title)
 		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+			w.WriteHeader(http.StatusInternalServerError)
+			w.Write([]byte("Error getting file"))
 			return
 		}
 
 		res, err := json.Marshal(p)
 		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+			w.WriteHeader(http.StatusInternalServerError)
+			w.Write([]byte("Error getting file"))
 			return
 		}
 
@@ -51,8 +57,13 @@ func (s *server) handleSave() http.HandlerFunc {
 		title := r.FormValue("title")
 		body := r.FormValue("body")
 		oldTitle := r.FormValue("oldTitle")
+		oldTitle, _ = url.QueryUnescape(oldTitle)
 
-		// TODO: data validation in both client and server
+		if exists, _ := s.pageExists(title); oldTitle != title && exists {
+			w.WriteHeader(http.StatusConflict)
+			w.Write([]byte("File name already exists"))
+			return
+		}
 
 		page := &page{Title: title, Body: body}
 
@@ -63,7 +74,8 @@ func (s *server) handleSave() http.HandlerFunc {
 			err = s.updatePage(oldTitle, page)
 		}
 		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+			w.WriteHeader(http.StatusInternalServerError)
+			w.Write([]byte("Error saving file"))
 		}
 	}
 }
@@ -72,10 +84,12 @@ func (s *server) handleDelete() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
 		title := vars["title"]
+		title, _ = url.QueryUnescape(title)
 
 		err := s.deletePage(title)
 		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+			w.WriteHeader(http.StatusInternalServerError)
+			w.Write([]byte("Error deleting file"))
 		}
 	}
 }

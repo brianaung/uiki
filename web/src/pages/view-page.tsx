@@ -1,68 +1,41 @@
 import { useState } from "react";
-import { useMutation, useQuery, useQueryClient } from "react-query";
-import { useLocation, useParams } from "wouter";
+import { useMutation, useQuery } from "react-query";
+import { useParams } from "wouter";
 import { Loading } from "../components/loading";
-import { Error } from "../components/error";
+import { Error as ErrorMessage } from "../components/error";
 import { Dialog } from "@headlessui/react";
 import { PageTemplate } from "./page-template";
 import { Page } from "../@types/types";
-import { FormDialog } from "../components/form-dialog";
+import { useHistory } from "../hooks/useHistory";
 
 const ViewPage = () => {
   const params = useParams();
-  const [_, setLocation] = useLocation();
-  const queryClient = useQueryClient();
+  const [_, setLocation] = useHistory();
 
   /* query initial page data */
   const { isLoading, error, data } = useQuery({
-    queryKey: ["pageData", params.title],
+    queryKey: ["pageData", encodeURIComponent(params.title as string)],
     queryFn: async ({ queryKey }): Promise<Page> =>
       await fetch(
         `${import.meta.env.VITE_UIKI_SERVER_URL}/view/${queryKey[1]}`,
       ).then(async (res) => await res.json()),
   });
 
-  /* handle edit and save form */
-  let [isFormOpen, setIsFormOpen] = useState(false);
-  const mutation = useMutation({
-    mutationFn: async (formData: FormData) => {
-      await fetch(`${import.meta.env.VITE_UIKI_SERVER_URL}/save`, {
-        method: "POST",
-        body: formData,
-      });
-      // return title here so it can be accessed inside onSuccess
-      return formData.get("title");
-    },
-    onSuccess: (title) => {
-      if (title !== params.title) {
-        // if page title is updated, reroute
-        setLocation(`/view/${title}`);
-      } else {
-        // else, refetch page data by invalidating
-        queryClient.invalidateQueries({ queryKey: ["pageData", params.title] });
-      }
-      setIsFormOpen(false);
-    },
-  });
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    e.stopPropagation();
-    // prepare formdata and then mutate
-    const formData = new FormData(e.currentTarget);
-    if (params.title) {
-      formData.append("oldTitle", params.title);
-    }
-    mutation.mutate(formData);
-  };
-
   /* handle delete */
   const [isDeleteOpen, setIsDeleteOpen] = useState<boolean>(false);
   const deletion = useMutation({
     mutationFn: async () =>
       await fetch(
-        `${import.meta.env.VITE_UIKI_SERVER_URL}/delete/${params.title}`,
-      ),
+        `${import.meta.env.VITE_UIKI_SERVER_URL}/delete/${encodeURIComponent(
+          params.title as string,
+        )}`,
+      ).then(async (res) => {
+        if (!res.ok) {
+          throw new Error(await res.text());
+        }
+      }),
     onSuccess: () => setLocation("/"), // return home on success
+    onError: (err) => alert(err),
   });
   const handleDelete = () => {
     deletion.mutate();
@@ -75,22 +48,21 @@ const ViewPage = () => {
           {isLoading ? (
             <Loading />
           ) : error ? (
-            <Error />
+            <ErrorMessage />
           ) : data ? (
             <article>
-              <button onClick={() => setIsFormOpen(!isFormOpen)}>edit</button>
+              <button
+                onClick={() =>
+                  setLocation(`/edit/${encodeURIComponent(data.title)}`, data)
+                }
+              >
+                edit
+              </button>
               <button onClick={() => setIsDeleteOpen(!isDeleteOpen)}>
                 delete
               </button>
               <h2>{data.title}</h2>
               <p>{data.body}</p>
-              <FormDialog
-                title={`Editing ${data.title}`}
-                data={data}
-                isOpen={isFormOpen}
-                setIsOpen={setIsFormOpen}
-                onSubmit={handleSubmit}
-              />
               <DeleteDialog
                 isOpen={isDeleteOpen}
                 setIsOpen={setIsDeleteOpen}
