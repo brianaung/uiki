@@ -1,9 +1,12 @@
 package server
 
 import (
+	"fmt"
 	"net/http"
+	"os"
 
 	"github.com/gofrs/uuid/v5"
+	"github.com/golang-jwt/jwt/v5"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -18,7 +21,7 @@ func (s *server) handleRegister() http.HandlerFunc {
 		// 2. username should be valid format
 		// 3. password should be strong enough
 
-		hashedPassword, err := hashPassword(password)
+		hashedPassword, err := hashAndSalt(password)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			w.Write([]byte(err.Error()))
@@ -58,16 +61,55 @@ func (s *server) handleLogin() http.HandlerFunc {
 			return
 		}
 
-		w.Write([]byte("success"))
+		// create token
+		token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+			"username": u.Username,
+		})
 
-		// ...
-		// check if username exists
-		// match the stored hashpassword and current password
-		// if match, authenticated!
+		tokenString, err := token.SignedString([]byte(os.Getenv("JWT_SECRET")))
+		if err != nil {
+			w.Write([]byte(err.Error()))
+			return
+		}
+
+		w.Write([]byte(tokenString))
 	}
 }
 
-func hashPassword(password string) (string, error) {
+// todo: create auth middleware for protected routes
+func (s *server) withAuth(next http.HandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		// tokenString := r.Header.Get("Authorization")
+
+		// sample token
+		tokenString := "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImpvaG5kb2UifQ.OFY_3SbHl2YaM7Y4Lj24eVMtcDaGEZU7KRzYCV4cqog"
+
+		token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+			if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+				return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
+			}
+			return os.Getenv("JWT_SECRET"), nil
+		})
+		if err != nil {
+			w.WriteHeader(http.StatusUnauthorized)
+			w.Write([]byte(err.Error()))
+			return
+		}
+
+		if claims, ok := token.Claims.(jwt.MapClaims); !ok || !token.Valid {
+			w.WriteHeader(http.StatusUnauthorized)
+			w.Write([]byte("unauthorized"))
+			return
+		} else {
+			fmt.Println(claims)
+		}
+
+		next(w, r)
+	}
+}
+
+func hashAndSalt(password string) (string, error) {
+	// GenerateFromPassword salt the password for us aside from hashing it
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.MinCost)
 	return string(hashedPassword), err
 }
