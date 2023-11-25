@@ -55,7 +55,11 @@ func (s *server) handleSave() http.HandlerFunc {
 		oldTitle := r.FormValue("oldTitle")
 		oldTitle, _ = url.QueryUnescape(oldTitle)
 
-		// TODO: data validation in both client and server
+		if exists, _ := s.pageExists(title); oldTitle != title && exists {
+			w.WriteHeader(http.StatusConflict)
+			w.Write([]byte("File name already exists"))
+			return
+		}
 
 		page := &page{Title: title, Body: body}
 
@@ -66,7 +70,8 @@ func (s *server) handleSave() http.HandlerFunc {
 			err = s.updatePage(oldTitle, page)
 		}
 		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+			w.WriteHeader(http.StatusInternalServerError)
+			w.Write([]byte("Error saving file"))
 		}
 	}
 }

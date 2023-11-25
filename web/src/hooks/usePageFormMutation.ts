@@ -1,10 +1,6 @@
 import { useMutation } from "react-query";
 import { useLocation } from "wouter";
 
-// TODO:
-// setLoading(true) when mutation starts
-// setLoading(false) either on success or error
-// then return success or error state? the caller can display a message
 export const usePageFormMutation = () => {
   const [_, setLocation] = useLocation();
 
@@ -14,12 +10,19 @@ export const usePageFormMutation = () => {
       await fetch(`${import.meta.env.VITE_UIKI_SERVER_URL}/save`, {
         method: "POST",
         body: formData,
+      }).then(async (res) => {
+        if (!res.ok) {
+          throw new Error(await res.text());
+        }
       });
       // return title here so it can be accessed inside onSuccess
       return formData.get("title") as string;
     },
     onSuccess: (title) => {
       setLocation(`/view/${encodeURIComponent(title)}`);
+    },
+    onError: (error) => {
+      alert(error);
     },
   });
 

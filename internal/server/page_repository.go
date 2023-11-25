@@ -54,3 +54,13 @@ func (s *server) deletePage(title string) error {
 	_, err := s.db.Exec(context.Background(), `delete from page where title = $1`, title)
 	return err
 }
+
+func (s *server) pageExists(title string) (bool, error) {
+	s.db.QueryRow(context.Background(), `select title from page where title = $1`, title)
+	exists := false
+	err := s.db.QueryRow(context.Background(), `select exists(select 1 from page where title = $1)`, title).Scan(&exists)
+	if err != nil {
+		return false, err
+	}
+	return exists, nil
+}
