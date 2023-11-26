@@ -7,7 +7,6 @@ import { Page } from "../@types/types";
 import { useEffect } from "react";
 import { useAuthContext } from "../hooks/useAuthContext";
 
-// TODO: handle errors gracefully (across the whole app)
 const LandingPage = () => {
   const [_, setLocation] = useLocation();
 
@@ -20,10 +19,8 @@ const LandingPage = () => {
       ),
   });
 
-  const { user, login, logout } = useAuthContext();
-  useEffect(() => {
-    console.log(user);
-  }, [user]);
+  // TODO: remove
+  const { logout } = useAuthContext();
 
   return (
     <PageTemplate
@@ -31,7 +28,7 @@ const LandingPage = () => {
         <>
           <h2>Welcome.</h2>
           <button onClick={() => setLocation("/new")}>create new page</button>
-          <button onClick={() => login()}>login</button>
+          <button onClick={() => setLocation("/login")}>login</button>
           <button onClick={() => logout()}>logout</button>
           <ul>
             {isLoading ? (
