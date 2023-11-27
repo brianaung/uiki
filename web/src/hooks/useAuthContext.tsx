@@ -2,7 +2,7 @@ import { createContext, useContext } from "react";
 import { useAuth } from "./useAuth";
 import { Auth } from "../@types/types";
 
-const AuthContext = createContext<Auth | {}>({});
+const AuthContext = createContext<Auth>({});
 
 const useAuthContext = () => useContext(AuthContext);
 

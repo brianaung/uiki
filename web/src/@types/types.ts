@@ -10,6 +10,6 @@ export type User = {
 
 export type Auth = {
   user: User | null;
-  login: () => void;
+  login: (username: string, password: string) => void;
   logout: () => void;
 };
